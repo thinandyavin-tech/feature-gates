@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Callable, Iterable, Mapping
+from datetime import UTC, datetime
 
 
 @dataclass(frozen=True)
@@ -36,14 +36,14 @@ class GateSet:
         self._flags = {flag.name: flag for flag in flags}
         if len(self._flags) == 0:
             raise ValueError("at least one flag is required")
-        self._clock = clock or (lambda: datetime.now(timezone.utc))
+        self._clock = clock or (lambda: datetime.now(UTC))
 
     def enabled(self, name: str, *, subject: str | None = None, environment: str | None = None, attributes: Mapping[str, str] | None = None) -> bool:
         return self.decide(name, subject=subject, environment=environment, attributes=attributes).enabled
 
     def decide(self, name: str, *, subject: str | None = None, environment: str | None = None, attributes: Mapping[str, str] | None = None) -> Decision:
         flag = self._flags.get(name)
-        now = self._clock().astimezone(timezone.utc).isoformat()
+        now = self._clock().astimezone(UTC).isoformat()
         if flag is None:
             return Decision(name, False, "unknown_flag", subject, environment, now)
         if not flag.enabled:

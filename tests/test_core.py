@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from feature_gates import Flag, GateSet
 
@@ -15,7 +15,7 @@ def test_environment_and_attributes_fail_closed():
 
 
 def test_unknown_and_missing_subject_are_safe():
-    gates = GateSet([Flag("x", enabled=True)], clock=lambda: datetime(2026, 1, 1, tzinfo=timezone.utc))
+    gates = GateSet([Flag("x", enabled=True)], clock=lambda: datetime(2026, 1, 1, tzinfo=UTC))
     assert gates.decide("missing").reason == "unknown_flag"
     assert gates.decide("x").reason == "subject_required"
     assert gates.decide("x").evaluated_at.startswith("2026-01-01")

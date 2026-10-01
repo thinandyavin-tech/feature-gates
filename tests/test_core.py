@@ -5,7 +5,9 @@ from feature_gates import Flag, GateSet
 
 def test_rollout_is_stable_for_subject():
     gates = GateSet([Flag("search_v2", enabled=True, rollout=50)])
-    assert gates.decide("search_v2", subject="u-1") == gates.decide("search_v2", subject="u-1")
+    first = gates.decide("search_v2", subject="u-1")
+    second = gates.decide("search_v2", subject="u-1")
+    assert (first.enabled, first.reason) == (second.enabled, second.reason)
 
 
 def test_environment_and_attributes_fail_closed():
